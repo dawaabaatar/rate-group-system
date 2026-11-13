@@ -13,7 +13,7 @@ import { Submissions } from './collections/Submissions'
 import { Teams } from './collections/Teams'
 import { Terms } from './collections/Terms'
 import { Users } from './collections/Users'
-import { getEnv } from './lib/env'
+import { allowedOrigins, getEnv } from './lib/env'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const env = getEnv()
@@ -24,8 +24,8 @@ export default buildConfig({
   collections: [Users, Terms, Criteria, Teams, Assignments, Submissions, Ratings, Otps, Sessions],
   // Давхар хамгаалалт: GraphQL хэрэггүй, нээхгүй. Cookie-тэй хүсэлт зөвхөн өөрийн origin-оос.
   graphQL: { disable: true },
-  csrf: [env.SERVER_URL],
-  cors: [env.SERVER_URL],
+  csrf: allowedOrigins(),
+  cors: allowedOrigins(),
   telemetry: false,
   admin: { user: Users.slug },
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },

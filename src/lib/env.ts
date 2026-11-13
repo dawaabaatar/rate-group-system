@@ -24,8 +24,20 @@ export function getEnv(): Env {
   if (cached) return cached
   const parsed = schema.parse(process.env)
   const isProd = process.env.NODE_ENV === 'production'
-  if (isProd && !parsed.SMTP_HOST) throw new Error('SMTP_HOST is required in production')
+  // Vercel preview builds also set NODE_ENV=production. Production deploys still require SMTP.
+  if (isProd && process.env.VERCEL_ENV !== 'preview' && !parsed.SMTP_HOST) {
+    throw new Error('SMTP_HOST is required in production')
+  }
   // 1 үнэлэгчтэй дундаж нь оноог шууд ил болгодог тул 2-оос доош болгохгүй
   cached = { ...parsed, MIN_RATERS: Math.max(2, parsed.MIN_RATERS), isProd }
   return cached
+}
+
+/** CSRF-д зөвшөөрөх origin. Preview deploy бүрийн хаяг VERCEL_URL дээр ирдэг. */
+export function allowedOrigins(): string[] {
+  const origins = new Set<string>([new URL(getEnv().SERVER_URL).origin])
+  for (const host of [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL]) {
+    if (host) origins.add(`https://${host}`)
+  }
+  return [...origins]
 }

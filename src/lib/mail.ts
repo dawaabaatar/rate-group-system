@@ -4,7 +4,8 @@ import { getEnv } from './env'
 export async function sendOtpMail(payload: Payload, to: string, code: string): Promise<void> {
   const env = getEnv()
   if (!env.SMTP_HOST) {
-    // Зөвхөн dev: SMTP тохируулаагүй үед консолд. Production-д SMTP заавал (env.ts).
+    // Зөвхөн dev: SMTP тохируулаагүй үед консолд. Production болон preview дээр кодыг хэзээ ч хэвлэхгүй.
+    if (env.isProd) throw new Error('smtp_not_configured')
     console.log(`[dev] ${to} -> нэвтрэх код: ${code}`)
     return
   }

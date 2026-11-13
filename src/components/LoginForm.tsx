@@ -10,6 +10,8 @@ function describe(error: string, data: { retryAfter?: number; attemptsLeft?: num
   switch (error) {
     case 'invalid_domain':
       return 'Зөвхөн edu.mn төгсгөлтэй имэйл хүлээн авна. Сургуулийн хаягаараа оролдоно уу.'
+    case 'mail_unavailable':
+      return 'Имэйл илгээх тохиргоо хараахан хийгдээгүй байна.'
     case 'cooldown':
       return `Дахин илгээхийн өмнө ${data.retryAfter ?? 60} секунд хүлээнэ үү.`
     case 'rate_limited':

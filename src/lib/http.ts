@@ -2,7 +2,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { ZodError } from 'zod'
 import type { User } from '@/payload-types'
-import { getEnv } from './env'
+import { allowedOrigins } from './env'
 
 export class HttpError extends Error {
   constructor(
@@ -26,9 +26,8 @@ export function clientIp(req: Request): string | undefined {
 
 /** CSRF: cookie-тэй өөрчлөх хүсэлт зөвхөн манай origin-оос ирнэ. */
 export function assertSameOrigin(req: Request): void {
-  if (req.headers.get('origin') !== new URL(getEnv().SERVER_URL).origin) {
-    throw new HttpError(403, 'bad_origin')
-  }
+  const origin = req.headers.get('origin')
+  if (!origin || !allowedOrigins().includes(origin)) throw new HttpError(403, 'bad_origin')
 }
 
 export async function requireUser(req: Request): Promise<SessionUser> {
